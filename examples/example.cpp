@@ -9,9 +9,12 @@ void doubled(int *arr)
   }
 }
 
+typedef int MyVar;
+
 int main()
 {
-  // doubled(arr);
-  int a = 3;
+  MyVar c = 6;
+  const int a = 3;
+  doubled(arr);
   int b = 7;
 }

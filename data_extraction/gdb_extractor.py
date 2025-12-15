@@ -14,20 +14,56 @@ class VariableRecorder:
         self.record_complete = False
         self.variable_state = {}
         self.watching_variables = []
-        self.max_step = 4  # TODO: to be changed
+        self.max_step = 1000  # TODO: to be changed
 
     def program_loop(self):
+
+        gdb.execute("set pagination off")
+
         self.step_count = 0
         self.record_complete = False
 
+        # Loop until it's out of main
         try:
+            gdb.execute("break main", to_string=True)
+            gdb.execute("run", to_string=True)
             while not self.record_complete and self.step_count < self.max_step:
                 self.step_and_eval()
                 self.step_count += 1
         except KeyboardInterrupt:
             print("\nExtraction Interrupted by User\n")
+        
+        gdb.execute("q")
+
+    def set_watch_variables(self, vars = []):
+        if vars == None or vars == []:
+            return
+        self.watching_variables = vars
+
+    def _is_on_frame(self, func_name="main"):
+        ### Find whether a func_name is on the frame stack
+        frame = gdb.selected_frame()
+        while frame:
+            if frame.name() == func_name:
+                return frame
+            frame = frame.older()
+        return None
+
 
     def step_and_eval(self):
+        # Check whether we're still on our program and not outside to libc part
+        try:
+            frame = self._is_on_frame("main")
+            sal = gdb.selected_frame().find_sal()
+
+            print(f"Found Line {sal.line} on:", frame.name())
+
+        except:
+            self.record_complete = True
+            print("Frame Check: Out of main")
+            return
+
+        # Try Stepping on the codeline
         try:
             gdb.execute("step", to_string=True)
         except gdb.error as e:
@@ -38,11 +74,27 @@ class VariableRecorder:
                 return
             raise
 
+
+        # Then check for the value
+        for var in self.watching_variables:
+            print("var", var, "=" ,self.extract_value(var))
+
+    def extract_value(self, var_name):
         try:
-            frame = gdb.selected_frame()
-            func_name = frame.name()
+            var = gdb.parse_and_eval(var_name)
+            var_type = var.type
+            type_code = var_type.code
+        except gdb.error:
+            return None
 
-            print(func_name)
+        # Find what typedef actually is
+        while type_code == gdb.TYPE_CODE_TYPEDEF:
+            var_type = var.type.target()
+            type_code = var_type.code
 
-        except:
-            self.record_complete = True
+        return f"{var} {var_type} {type_code}"
+        
+
+recorder = VariableRecorder()
+recorder.set_watch_variables(["a", "c"])
+recorder.program_loop()
