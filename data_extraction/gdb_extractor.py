@@ -7,6 +7,9 @@ import json
 import hashlib
 from datetime import datetime
 
+# TESTING VARIABLES NEED TO CHANGE LATER
+G_MAX_ARRAY_SIZE = 40
+
 
 class VariableRecorder:
     def __init__(self):
@@ -82,19 +85,72 @@ class VariableRecorder:
     def extract_value(self, var_name):
         try:
             var = gdb.parse_and_eval(var_name)
-            var_type = var.type
-            type_code = var_type.code
         except gdb.error:
+            # Happen when variable not in scope
             return None
-
+        return self._extract_value(var)
+    
+    def _extract_value(self, var):
+        var_type = var.type
+        type_code = var_type.code
         # Find what typedef actually is
+        print("TYPE:", str(var_type), "CODE: ", var_type.code)
+        print("INT CODE:", gdb.TYPE_CODE_INT, "CHAR CODE: ", gdb.TYPE_CODE_CHAR)
         while type_code == gdb.TYPE_CODE_TYPEDEF:
-            var_type = var.type.target()
+            # https://sourceware.org/gdb/current/onlinedocs/gdb.html/Types-In-Python.html
+            print("TYPE:", str(var_type), "CODE: ", var_type.code)
+            var_type = var_type.target()
             type_code = var_type.code
 
-        return f"{var} {var_type} {type_code}"
-        
+        type_name = str(var_type)
+        return_structure = {
+            'type': type_name,
+            'value': None
+        }
+        match type_code:
+            case gdb.TYPE_CODE_INT:
+                print("\nINT\n")
+                return_structure['value'] = int(var)
+            case gdb.TYPE_CODE_FLT:
+                return_structure['value'] = float(var)
+            case gdb.TYPE_CODE_BOOL:
+                return_structure['value'] = bool(var)
+            case gdb.TYPE_CODE_CHAR:
+                print("\nCHAR\n")
+                val = int(var)
+                print(chr(val))
+                return_structure['value'] = chr(val) if 32 <= val < 127 else '?' 
+            case gdb.TYPE_CODE_ARRAY:
+                return self._extract_array(var, var_type)
+            case _:
+                return_structure['value'] = None
+        return return_structure 
+    def _extract_array(self, var, var_type):
+        """
+        """
+        # Array type will have range that tell how large the first dimension is 
+        try:
+            low, high = var_type.range()
+            size = high - low + 1
+
+            print("SIZE: ", size)
+            elems = []
+            elems_type = None
+            for i in range(min(size, G_MAX_ARRAY_SIZE)):
+                print("EXTRACTING ", i)
+                elem = self._extract_value(var[i])
+                print(elem)
+                elems.append(elem)
+
+            return {
+                'type': str(var_type),
+                'size': size,
+                'elements': elements
+            }
+        except:
+            return {'type': str(var_type), 'error': 'Cannot Extract Value'}
+
 
 recorder = VariableRecorder()
-recorder.set_watch_variables(["a", "c"])
+recorder.set_watch_variables(["arr", 'x'])
 recorder.program_loop()
