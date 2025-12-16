@@ -10,13 +10,22 @@ void doubled(int *p_arr)
   }
 }
 
-typedef int MyVar;
+typedef struct {
+  int num;
+} MyVar;
+MyVar *p = NULL;
+
 
 int main()
 {
   char x = 'G';
-  MyVar c = 6;
+  MyVar c = {7};
   const int a = 3;
   doubled(arr);
   int b = 7;
+  MyVar* p = &c;
+
+
+  p->num = 4;
+
 }

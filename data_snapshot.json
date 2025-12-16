@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-12-15T20:36:25.906513",
+  "variable_name": "p",
+  "data": {
+    "type": "pointer",
+    "address": "0x7fffffffded4",
+    "points_to_type": "MyVar",
+    "dereferenced": {
+      "type": "struct",
+      "type_name": "MyVar",
+      "fields": {
+        "num": {
+          "type": "int",
+          "value": 4,
+          "type_name": "int",
+          "hex": "0x4"
+        }
+      },
+      "field_order": [
+        "num"
+      ]
+    }
+  }
+}
