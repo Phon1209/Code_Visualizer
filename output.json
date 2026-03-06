@@ -1,0 +1,44 @@
+[
+  {
+    "variable": "a",
+    "new_value": -134340976,
+    "file": "./examples/example.c",
+    "line": 21,
+    "function": "main"
+  },
+  {
+    "variable": "f",
+    "new_value": 4.591634678053128e-41,
+    "file": "./examples/example.c",
+    "line": 21,
+    "function": "main"
+  },
+  {
+    "variable": "a",
+    "new_value": 5,
+    "file": "./examples/example.c",
+    "line": 22,
+    "function": "main"
+  },
+  {
+    "variable": "f",
+    "new_value": 10.399999618530273,
+    "file": "./examples/example.c",
+    "line": 24,
+    "function": "main"
+  },
+  {
+    "variable": "a",
+    "new_value": 10,
+    "file": "./examples/example.c",
+    "line": 25,
+    "function": "main"
+  },
+  {
+    "variable": "f",
+    "new_value": 14.899999618530273,
+    "file": "./examples/example.c",
+    "line": 27,
+    "function": "main"
+  }
+]
