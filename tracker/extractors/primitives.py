@@ -27,7 +27,8 @@ class FloatExtractor(BaseExtractor):
 
 class CharExtractor(BaseExtractor):
     def can_handle(self, val_type):
-        return val_type.code == gdb.TYPE_CODE_CHAR
+        return val_type.code == gdb.TYPE_CODE_CHAR or \
+                (val_type.code == gdb.TYPE_CODE_INT and val_type.sizeof == 1)
 
     def extract(self, val, context):
         char_int = int(val)

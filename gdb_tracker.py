@@ -9,7 +9,7 @@ from tracker.watcher import Watcher
 
 
 # Configuration
-watched_vars = ["a", "arr", "*p"]
+watched_vars = ["a", "arr", "p", "c"]
 emitter = JsonFileEmitter("output.json")
 watcher = Watcher(watched_vars, emitter)
 

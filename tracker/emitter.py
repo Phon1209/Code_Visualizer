@@ -15,7 +15,7 @@ class JsonFileEmitter:
 
     def __init__(self, path: str):
         self.path = Path(path)
-        self.debug = True
+        self.debug = False
         self.events: list[dict] = []
 
     def emit(self, event: dict):

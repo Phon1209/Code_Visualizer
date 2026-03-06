@@ -15,8 +15,8 @@ class ExtractorRegistry:
         # Order of register matters - specific extractors first = it will be checked last
 
         self.register(VoidExtractor())
-        self.register(IntExtractor())
         self.register(CharExtractor())
+        self.register(IntExtractor())
         self.register(FloatExtractor())
         self.register(PointerExtractor())
 

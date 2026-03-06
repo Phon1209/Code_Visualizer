@@ -18,15 +18,15 @@ class PointerExtractor(BaseExtractor):
             return f"<cycle@{addr:#x}>"
         visited.add(addr)
 
-        target_type = val.type.target().strip_type_defs()
+        target_type = val.type.target().strip_typedefs()
         # If it's char*, it's a string
-        if target_type.code == gdb.TYPE_CODE_CHAR:
+        if target_type.code == gdb.TYPE_CODE_CHAR or \
+            (target_type.code == gdb.TYPE_CODE_INT and target_type.sizeof == 1):
             try: 
                 return val.string() # gdb will read this until null terminator
             except gdb.error:
-                return f"<unreadable string@{char:#x}>"
+                return f"<unreadable string@{addr:#x}>"
 
-        # TODO: Handle the rest of the type
         try:
             return context["registry"].extract(val.dereference(), context)
         except gdb.error:
